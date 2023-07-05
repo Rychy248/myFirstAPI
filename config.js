@@ -1,5 +1,6 @@
 
 // --------------------- IMPORTING  AND SETTING---------------------
+const bodyParser = require('body-parser');
 const 
 // Local modules
     path = require('path'),
@@ -17,7 +18,8 @@ const
         port:8080
     },
 // create app
-    app = express()
+    app = express(),
+    app.use(bodyParser.urlencoded())
 ;
     
 // -------- MIDLEWARE
