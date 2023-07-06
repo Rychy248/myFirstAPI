@@ -1,9 +1,3 @@
-//  --------------midleware PARSER
-const
-    bodyParser = require("body-parser"),
-    urlEncoded = bodyParser.urlencoded({extended:true}),
-    jsonParser = bodyParser.json()
-;
 
 /**
  * 
@@ -11,7 +5,7 @@ const
  * @param { express } express the module express
  */
 function urlFunction(app,express) {
-    app.use("/", require("./routerHome")(express, urlEncoded, jsonParser));
+    app.use("/articles", require("./articleRouter")(express));
 };
 
 module.exports = urlFunction;
