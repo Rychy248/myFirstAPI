@@ -8,10 +8,11 @@ function routerFunction(express) {
         next();
     });
     // controller import
-    const { articleGet } = require("./../controllers/articleController");
+    const { articleGet, articlePost } = require("./../controllers/articleController");
 
     // HTTP METHODS, AND REPONSE
     articleRouter.get("/",articleGet);
+    articleRouter.post("/",articlePost);
 
     return articleRouter;
 };
