@@ -1,6 +1,6 @@
 
 const { article } = require("../models/articleModel");
-const { MyError } = require("../utils/customErrors");
+const { MyError, defaultError } = require("../utils/customErrors");
 
 function articleGet(req,res,next) {
     const query = (req.params.articleId) ? {_id : req.params.articleId} : {};
@@ -22,13 +22,10 @@ function articleGet(req,res,next) {
                 data: [],
             });
         }else{
-            res.json({
-                error:err,
-                status:300,
-                data: null,
-            });
+            res.json(defaultError(err));
         };
     });
+
 };
 
 function articlePost(req, res, next){
@@ -41,15 +38,11 @@ function articlePost(req, res, next){
             error:0,
             status:200,
             msg:"Succesfull posted",
-            response:response
+            data:response
         });
     })
     .catch((err) => {
-        res.json({
-            error:err,
-            status:300,
-            data: null,
-        });
+        res.json(defaultError(err));
     });
     
 };
@@ -65,11 +58,31 @@ function articleDeleteMany(req, res, next){
         });
     })
     .catch((err)=>{
-        res.json({
-            error:err,
-            status: 300,
-            msg:"Error produced",
-        });
+        res.json(defaultError(err));
+    });
+};
+
+function articleDeleteOne(req, res, next){
+    article.deleteOne({_id : req.params.articleId})
+    .then((response)=>{
+        if (response.deletedCount == 0){
+            res.json({
+                error:0,
+                status: 200,
+                msg:`Article NOT FOUND`,
+                data:response,
+            });
+        }else{
+            res.json({
+                error:0,
+                status: 200,
+                msg:`Article was deleted succesfully`,
+                data:response,
+            });
+        };
+    })
+    .catch((err)=>{
+        res.json(defaultError(err));
     });
 };
 
@@ -91,17 +104,51 @@ async function articlePut(req, res, next) {
         toSend.msg = (response.matchedCount > 0) ? "Article updated successufully" : "Any article matched, any change did";
         toSend.data = response;
     } catch (error) {
-        console.log(JSON.stringify(error));
         if(error.name == "CastError" && query._id ){
             toSend.error = "InvalidId";
             toSend.msg = "Article not found, invalid ID";
         }else{
-            toSend.error = `${error.name}`;
-            toSend.status = 300;
-            toSend.msg = error.msg ? error.msg : `${error}`;
+            Object.assign(toSend,defaultError(error)); // asign the default atributes to Send
         };
     };
 
     res.json(toSend);
 };
-module.exports =  { articleGet, articlePost, articleDeleteMany, articlePut }
+
+function articlePatch(req,res,next){
+    const [conditions, updates] = [{_id : req.params.articleId} , req.body];
+    
+    if (Object.keys(updates).length == 0){
+        res.json(
+            defaultError(new MyError("No title or content sended","EmptyData"))
+        );
+    }else{
+        article.patch(conditions, updates)
+        .then((response)=>{
+            res.json({
+                error:0,
+                status:200,
+                msg : (response.matchedCount > 0) ? "Article updated successufully" : "Any article matched, any change did",
+                data : response,
+            });
+        })
+        .catch((err)=>{
+            if(err.name == "CastError" && query._id ){
+                res.json({
+                    error:"InvalidId",
+                    status:200,
+                    msg :"Article not found, invalid ID",
+                    data : response,
+                });
+            }else{
+                res.json(defaultError(err));
+            };
+        });
+    };
+
+};
+
+module.exports =  {
+    articleGet, articlePost, articleDeleteMany,
+    articlePut, articlePatch, articleDeleteOne
+};

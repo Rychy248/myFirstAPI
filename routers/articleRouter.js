@@ -10,7 +10,7 @@ function routerFunction(express) {
     // controller import
     const { 
         articleGet, articlePost, articleDeleteMany,
-        articlePut
+        articlePut, articlePatch, articleDeleteOne
     
     } = require("./../controllers/articleController");
 
@@ -20,12 +20,13 @@ function routerFunction(express) {
         .post(articlePost)
         .delete(articleDeleteMany)
     ;
-    // particular id
+        // particular id
     articleRouter.route("/:articleId")
         .get(articleGet)
         .put(articlePut)
-    ;
-    // articleRouter.put("/:articleId", articleGet);
+        .patch(articlePatch)
+        .delete(articleDeleteOne)
+    ;   
     
     return articleRouter;
 };
