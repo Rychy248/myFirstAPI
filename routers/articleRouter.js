@@ -8,12 +8,25 @@ function routerFunction(express) {
         next();
     });
     // controller import
-    const { articleGet, articlePost } = require("./../controllers/articleController");
+    const { 
+        articleGet, articlePost, articleDeleteMany,
+        articlePut
+    
+    } = require("./../controllers/articleController");
 
     // HTTP METHODS, AND REPONSE
-    articleRouter.get("/",articleGet);
-    articleRouter.post("/",articlePost);
-
+    articleRouter.route("/")
+        .get(articleGet)
+        .post(articlePost)
+        .delete(articleDeleteMany)
+    ;
+    // particular id
+    articleRouter.route("/:articleId")
+        .get(articleGet)
+        .put(articlePut)
+    ;
+    // articleRouter.put("/:articleId", articleGet);
+    
     return articleRouter;
 };
 
