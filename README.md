@@ -32,7 +32,7 @@ npm i
     nodemon index.js
 ``` 
 ### CONFIGURE CORS
-got to, "./config.js", and ad your domains to the array "allowedOrigins":
+got to, "./config.js", and add your domains to the array "allowedOrigins":
 ``` js
 // ./config.js
 
